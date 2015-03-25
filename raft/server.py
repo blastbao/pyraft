@@ -24,12 +24,18 @@ class RaftServer:
 
 
     def _processRpc_AppendEntries(self, appendEntries):
+        leaderCurrentTerm = appendEntries.getTerm()
+        prevLogIndex = appendEntries.getPrevLogIndex()
         # Receiver step 1
-        if appendEntries.getTerm() < self._persistentState.getCurrentTerm():
+        if leaderCurrentTerm < self._persistentState.getCurrentTerm():
             return False
         # Receiver step 2
         logEntriesStore = self._persistentState.getLogEntriesStore()
-        if logEntriesStore.getLastIndex() < appendEntries.getPrevLogIndex():
+        if logEntriesStore.getLastIndex() < prevLogIndex:
+            return False
+        # Receiver step 3
+        if logEntriesStore.getTermForIndex(prevLogIndex) != leaderCurrentTerm:
+            logEntriesStore.deleteFromIndex(prevLogIndex)
             return False
         #
         return True

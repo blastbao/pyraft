@@ -9,6 +9,10 @@ class LogEntriesStore:
         "Delete existing entry at given index and all that follow."
         raise NotImplementedError("Method must be implemented by subclass")
 
+    def getTermForIndex(self, logIndex):
+        "Get the term for entry at given index."
+        raise NotImplementedError("Method must be implemented by subclass")
+
 
 
 class RaftPersistentState:
